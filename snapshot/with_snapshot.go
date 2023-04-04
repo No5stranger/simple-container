@@ -48,9 +48,21 @@ func BusyBoxExample() error {
 	if err != nil {
 		return err
 	}
+	log.Printf("Task created, %s", task.ID())
+	defer task.Delete(ctx)
+	existStatus, err := task.Wait(ctx)
+	if err != nil {
+		return err
+	}
 	if err := task.Start(ctx); err != nil {
 		return err
 	}
 	log.Printf("Containerd started...")
+	status := <-existStatus
+	code, _, err := status.Result()
+	if err != nil {
+		return err
+	}
+	log.Printf("Task exited, code:%d", code)
 	return nil
 }

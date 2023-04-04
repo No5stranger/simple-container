@@ -1,5 +1,3 @@
-//go:build linux && darwin
-
 package snapshot
 
 import (
@@ -43,10 +41,10 @@ func BusyBoxExample() error {
 	if err != nil {
 		return err
 	}
-	//defer container.Delete(ctx, containerd.WithSnapshotCleanup)
+	//defer container.Delete(ctx, container.WithSnapshotCleanup)
 	log.Printf("Containerd created %s", container.ID())
 
-	task, err := containerd.NewTask(cio.NewCreator(cio.WithStdio))
+	task, err := container.NewTask(ctx, cio.NewCreator(cio.WithStdio))
 	if err != nil {
 		return err
 	}

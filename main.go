@@ -1,11 +1,9 @@
-//go:build linux && darwin
-
 package main
 
 import (
 	"log"
 
-	sc "github.com/no5stranger/simple-containerd/snapshotter"
+	sc "github.com/no5stranger/simple-containerd/snapshot"
 )
 
 func main() {

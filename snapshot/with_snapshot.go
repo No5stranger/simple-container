@@ -22,33 +22,33 @@ func BusyBoxExample() error {
 	ctx := namespaces.WithNamespace(context.Background(), "default")
 	image, err := client.Pull(
 		ctx,
-		"docker.io/library/busybox:latest",
+		"docker.io/library/nginx:stable",
 		containerd.WithPullUnpack,
 		//containerd.WithPullSnapshotter("a-overlayfs"),
 	)
 	if err != nil {
 		return err
 	}
-	log.Printf("Pulled image %s", image.Name())
+	log.Printf("Pulled image, name:%s", image.Name())
 	rootfs, err := image.RootFS(ctx)
 	if err != nil {
 		return err
 	}
-	pullCostTime := time.Now().Unix() - startTime.Unix()
-	log.Printf("Image Pulled, Rootfs:%v, cost:%d", rootfs, pullCostTime)
+	pullCostTime := time.Now().UnixMilli() - startTime.UnixMilli()
+	log.Printf("Image Pulled, Rootfs:%v, cost:%dms", rootfs, pullCostTime)
 
 	container, err := client.NewContainer(
 		ctx,
-		"busybox-server",
-		containerd.WithNewSnapshot("busybox-snapshot", image),
+		"nginx-server",
+		containerd.WithNewSnapshot("nginx-snapshot", image),
 		containerd.WithNewSpec(oci.WithImageConfig(image)),
 	)
 	if err != nil {
 		return err
 	}
 	defer container.Delete(ctx, containerd.WithSnapshotCleanup)
-	containerCostTime := time.Now().Unix() - startTime.Unix()
-	log.Printf("Containerd created %s, cost:%d", container.ID(), containerCostTime)
+	containerCostTime := time.Now().UnixMilli() - startTime.UnixMilli()
+	log.Printf("Containerd created, id:%s, cost:%dms", container.ID(), containerCostTime)
 
 	task, err := container.NewTask(ctx, cio.NewCreator(cio.WithStdio))
 	if err != nil {

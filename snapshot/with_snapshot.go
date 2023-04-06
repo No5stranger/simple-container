@@ -46,8 +46,9 @@ func BusyBoxExample() error {
 	if err != nil {
 		return err
 	}
-	//defer container.Delete(ctx, container.WithSnapshotCleanup)
-	log.Printf("Containerd created %s", container.ID())
+	defer container.Delete(ctx, containerd.WithSnapshotCleanup)
+	containerCostTime := time.Now().Unix() - startTime.Unix()
+	log.Printf("Containerd created %s, cost:%d", container.ID(), containerCostTime)
 
 	task, err := container.NewTask(ctx, cio.NewCreator(cio.WithStdio))
 	if err != nil {
@@ -64,8 +65,8 @@ func BusyBoxExample() error {
 	}
 	log.Printf("Containerd started...")
 
-	time.Sleep(1 * time.Minute)
-	if err := task.Kill(ctx, syscall.SIGTERM); err != nil {
+	time.Sleep(3 * time.Second)
+	if err := task.Kill(ctx, syscall.SIGKILL); err != nil {
 		return err
 	}
 	fmt.Printf("Task killed, %v", task.ID())

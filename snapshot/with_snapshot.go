@@ -22,7 +22,7 @@ func BusyBoxExample() error {
 	ctx := namespaces.WithNamespace(context.Background(), "default")
 	image, err := client.Pull(
 		ctx,
-		"docker.io/library/busybox:latest",
+		"docker.io/library/redis:latest",
 		containerd.WithPullUnpack,
 		containerd.WithPullSnapshotter("a-overlayfs"),
 	)
@@ -39,8 +39,8 @@ func BusyBoxExample() error {
 
 	container, err := client.NewContainer(
 		ctx,
-		"busy-server",
-		containerd.WithNewSnapshot("busybox-snapshot", image),
+		"redis-server",
+		containerd.WithNewSnapshot("redis-snapshot", image),
 		containerd.WithNewSpec(oci.WithImageConfig(image)),
 	)
 	if err != nil {

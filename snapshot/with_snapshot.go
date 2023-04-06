@@ -2,7 +2,10 @@ package snapshot
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"syscall"
+	"time"
 
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/cio"
@@ -11,6 +14,7 @@ import (
 )
 
 func BusyBoxExample() error {
+	startTime := time.Now()
 	client, err := containerd.New("/run/containerd/containerd.sock")
 	if err != nil {
 		return err
@@ -30,7 +34,8 @@ func BusyBoxExample() error {
 	if err != nil {
 		return err
 	}
-	log.Printf("Image Rootfs %v", rootfs)
+	pullCostTime := time.Now().Unix() - startTime.Unix()
+	log.Printf("Image Pulled, Rootfs:%v, cost:%d", rootfs, pullCostTime)
 
 	container, err := client.NewContainer(
 		ctx,
@@ -58,6 +63,13 @@ func BusyBoxExample() error {
 		return err
 	}
 	log.Printf("Containerd started...")
+
+	time.Sleep(1 * time.Minute)
+	if err := task.Kill(ctx, syscall.SIGTERM); err != nil {
+		return err
+	}
+	fmt.Printf("Task killed, %v", task.ID())
+
 	status := <-existStatus
 	code, _, err := status.Result()
 	if err != nil {

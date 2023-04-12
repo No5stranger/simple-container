@@ -24,7 +24,7 @@ func BusyBoxExample() error {
 		ctx,
 		"docker.io/library/nginx:stable",
 		containerd.WithPullUnpack,
-		//containerd.WithPullSnapshotter("a-overlayfs"),
+		containerd.WithPullSnapshotter("a-overlayfs"),
 	)
 	if err != nil {
 		return err

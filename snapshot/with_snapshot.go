@@ -40,7 +40,7 @@ func BusyBoxExample() error {
 	container, err := client.NewContainer(
 		ctx,
 		"nginx-server",
-		containerd.WithNewSnapshot("nginx-snapshot", image),
+		//containerd.WithNewSnapshot("nginx-snapshot", image),
 		containerd.WithNewSpec(oci.WithImageConfig(image)),
 	)
 	if err != nil {

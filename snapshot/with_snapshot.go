@@ -3,6 +3,7 @@ package snapshot
 import (
 	"context"
 	"fmt"
+	"github.com/containerd/containerd/snapshots"
 	"log"
 	"strings"
 	"syscall"
@@ -22,13 +23,13 @@ func ContainerExample(ref string) error {
 	}
 	ctx := namespaces.WithNamespace(context.Background(), "default")
 	refName := strings.ReplaceAll(ref, ":", "-")
-	//labels := map[string]string{"containerd.io/snapshot/image-cache": fmt.Sprintf("imc-%s", refName)}
+	labels := map[string]string{"containerd.io/snapshot/image-cache": fmt.Sprintf("imc-%s", refName)}
 	image, err := client.Pull(
 		ctx,
 		fmt.Sprintf("docker.io/library/%s", ref),
 		containerd.WithPullUnpack,
-		//containerd.WithPullSnapshotter("a-overlayfs", snapshots.WithLabels(labels)),
-		containerd.WithPullSnapshotter("a-overlayfs"),
+		containerd.WithPullSnapshotter("a-overlayfs", snapshots.WithLabels(labels)),
+		//containerd.WithPullSnapshotter("a-overlayfs"),
 	)
 	if err != nil {
 		return err

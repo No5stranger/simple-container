@@ -7,7 +7,8 @@ import (
 )
 
 func main() {
-	err := sc.BusyBoxExample()
+	//err := sc.BusyBoxExample()
+	err := sc.NginxExample()
 	if err != nil {
 		log.Fatal(err)
 	}

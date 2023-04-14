@@ -90,11 +90,12 @@ func NginxExample() error {
 		return err
 	}
 	ctx := namespaces.WithNamespace(context.Background(), "default")
+	labels := map[string]string{"containerd.io/snapshot/image-cache": "imc-nginx-stable"}
 	image, err := client.Pull(
 		ctx,
 		"docker.io/library/nginx:stable",
 		containerd.WithPullUnpack,
-		containerd.WithPullSnapshotter("a-overlayfs"),
+		containerd.WithPullSnapshotter("a-overlayfs", snapshots.WithLabels(labels)),
 	)
 	if err != nil {
 		return err

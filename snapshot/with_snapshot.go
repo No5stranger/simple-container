@@ -15,7 +15,7 @@ import (
 	"github.com/containerd/containerd/oci"
 )
 
-func ContainerExample(ref string) error {
+func ContainerExample(ref string, waiTime int64) error {
 	startTime := time.Now()
 	client, err := containerd.New("/run/containerd/containerd.sock")
 	if err != nil {
@@ -71,7 +71,7 @@ func ContainerExample(ref string) error {
 	}
 	log.Printf("Containerd started...")
 
-	time.Sleep(3 * time.Second)
+	time.Sleep(time.Duration(waiTime) * time.Second)
 	if err := task.Kill(ctx, syscall.SIGKILL); err != nil {
 		return err
 	}

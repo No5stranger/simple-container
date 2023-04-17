@@ -13,6 +13,7 @@ func main() {
 	)
 	flag.StringVar(&ref, "ref", "busybox:latest", "image name")
 	flag.Int64Var(&waiTime, "wait", 60, "wait time to kill container")
+	flag.Parse()
 	if len(ref) == 0 {
 		log.Fatal("miss image ref")
 	}

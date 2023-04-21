@@ -34,7 +34,7 @@ func main() {
 		if len(snapID) == 0 {
 			log.Fatal("miss snapshot id")
 		}
-		err = sc.WithSnapshot(snapID, waiTime)
+		err = sc.WithSnapshot(ref, snapID, waiTime)
 	}
 	if err != nil {
 		log.Fatal(err)

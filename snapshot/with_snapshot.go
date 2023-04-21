@@ -98,6 +98,7 @@ func WithSnapshot(id string, waiTime int64) error {
 		ctx,
 		"test-custom-snapshot",
 		containerd.WithSnapshot(id),
+		containerd.WithNewSpec(oci.WithDefaultSpec()),
 	)
 	if err != nil {
 		return err

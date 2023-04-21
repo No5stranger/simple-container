@@ -87,18 +87,26 @@ func ContainerExample(ref string, waiTime int64) error {
 	return nil
 }
 
-func WithSnapshot(id string, waiTime int64) error {
+func WithSnapshot(ref, id string, waiTime int64) error {
 	starTime := time.Now()
 	client, err := containerd.New("/run/containerd/containerd.sock")
 	if err != nil {
 		return err
 	}
 	ctx := namespaces.WithNamespace(context.Background(), "default")
+	image, err := client.Pull(
+		ctx,
+		fmt.Sprintf("docker.io/library/%s", ref),
+		containerd.WithPullUnpack,
+	)
+	if err != nil {
+		return err
+	}
 	container, err := client.NewContainer(
 		ctx,
 		"test-custom-snapshot",
 		containerd.WithSnapshot(id),
-		containerd.WithNewSpec(oci.WithDefaultSpec()),
+		containerd.WithNewSpec(oci.WithImageConfig(image)),
 	)
 	if err != nil {
 		return err

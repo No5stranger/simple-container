@@ -3,11 +3,12 @@ package snapshot
 import (
 	"context"
 	"fmt"
-	"github.com/containerd/containerd/snapshots"
 	"log"
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/containerd/containerd/snapshots"
 
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/cio"
@@ -75,7 +76,7 @@ func ContainerExample(ref string, waiTime int64) error {
 	if err := task.Kill(ctx, syscall.SIGKILL); err != nil {
 		return err
 	}
-	fmt.Printf("Task killed, %v", task.ID())
+	fmt.Printf("Task killed, %v\n", task.ID())
 
 	status := <-existStatus
 	code, _, err := status.Result()
@@ -83,5 +84,52 @@ func ContainerExample(ref string, waiTime int64) error {
 		return err
 	}
 	log.Printf("Task exited, code:%d", code)
+	return nil
+}
+
+func WithSnapshot(id string, waiTime int64) error {
+	starTime := time.Now()
+	client, err := containerd.New("/run/containerd/containerd.sock")
+	if err != nil {
+		return err
+	}
+	ctx := namespaces.WithNamespace(context.Background(), "default")
+	container, err := client.NewContainer(
+		ctx,
+		"test-custom-snapshot",
+		containerd.WithSnapshot(id),
+	)
+	if err != nil {
+		return err
+	}
+	defer container.Delete(ctx)
+	cosTime := time.Now().UnixMilli() - starTime.UnixMilli()
+	log.Printf("Containerd created, id:%s, cost:%sms", container.ID(), cosTime)
+
+	task, err := container.NewTask(ctx, cio.NewCreator(cio.WithStdio))
+	if err != nil {
+		return err
+	}
+	log.Printf("Task Created, %s", task.ID())
+	defer task.Delete(ctx)
+	existStatus, err := task.Wait(ctx)
+	if err != nil {
+		return err
+	}
+	if err := task.Start(ctx); err != nil {
+		return err
+	}
+	log.Printf("containerd started...")
+
+	time.Sleep(time.Duration(waiTime) * time.Second)
+	if err := task.Kill(ctx, syscall.SIGKILL); err != nil {
+		log.Printf("Task killed, id:%s", task.ID())
+	}
+	status := <-existStatus
+	code, _, err := status.Result()
+	if err != nil {
+		return err
+	}
+	log.Printf("Task existed, code:%d", code)
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"strings"
 	"syscall"
 	"time"
@@ -102,9 +103,10 @@ func WithSnapshot(ref, id string, waiTime int64) error {
 	if err != nil {
 		return err
 	}
+	cid := rand.Intn(100)
 	container, err := client.NewContainer(
 		ctx,
-		"test-custom-snapshot",
+		fmt.Sprintf("test-custom-snapshot-%d", cid),
 		containerd.WithSnapshot(id),
 		containerd.WithNewSpec(oci.WithImageConfig(image)),
 	)
